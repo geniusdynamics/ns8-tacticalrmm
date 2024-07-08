@@ -14,20 +14,20 @@ import agent
 data = json.load(sys.stdin)
 
 #This is specific to you module, so you need to change it accordingly.
-# we read a json stdin {"vars1":true, "var2":"foo", "vars3": 3} and we writ it to .config/state/environment
-# Upper case to set environment variable and minor case to read from stdin
+HOST = data.get('host')
 
-# this values must exists in the json stdin
-# agent.set_env("MAIL_SERVER", data["mail_server"])
-# agent.set_env("LDAP_DOMAIN", data["ldap_domain"])
+MESH_HOST = data.get('MESH_HOST', 'https://mesh'+HOST)
+MESH_USER = data.get('MESH_USER', 'meshadmin')
+MESH_PASS = data.get('MESH_PASS', 'password')
+MESH_PERSISTENT_CONFIG = data.get('MESH_PERSISTENT_CONFIG', '0')
 
-# you can add default values for the following variables
-# agent.set_env("MAIL_DOMAIN",data.get("mail_domain",""))
-# agent.set_env("WOWORKERSCOUNT",data.get("workers_count",3))
-# agent.set_env("AUXILIARYACCOUNT",data.get("auxiliary_account",True))
-# agent.set_env("ACTIVESYNC",data.get("activesync",False))
+mesh_config = {
+    'MESH_HOST': MESH_HOST,
+    'MESH_USER': MESH_USER,
+    'MESH_PASS': MESH_PASS,
+    'MESH_PERSISTENT_CONFIG': MESH_PERSISTENT_CONFIG
+}
+agent.write_envfile("mesh-config.env", mesh_config)
 
-
-# Make sure everything is saved inside the environment file
 # just before starting systemd unit
 #agent.dump_env()

@@ -66,6 +66,38 @@
               <cv-accordion-item :open="toggleAccordion[0]">
                 <template slot="title">{{ $t("settings.advanced") }}</template>
                 <template slot="content">
+                  <cv-text-input
+                      :label="$t('Mesh Central Host')"
+                      placeholder="mesh.example.org"
+                      v-model.trim="MESH_HOST"
+                      class="mg-bottom"
+                      :invalid-message="$t(error.MESH_HOST)"
+                      :disabled="loading.getConfiguration || loading.configureModule"
+                      ref="MESH_HOST"
+                  >
+                  </cv-text-input>
+
+                  <cv-text-input
+                      :label="$t('Mesh Central User')"
+                      placeholder="user"
+                      v-model="MESH_USER"
+                      class="mg-bottom"
+                      :invalid-message="$t(error.MESH_USER)"
+                      :disabled="loading.getConfiguration || loading.configureModule"
+                      ref="MESH_USER"
+                  >
+                  </cv-text-input>
+                  <cv-text-input
+                      :label="$t('Mesh Central Password')"
+                      placeholder="password"
+                      v-model="MESH_PASSWORD"
+                      class="mg-bottom"
+                      :invalid-message="$t(error.MESH_PASSWORD)"
+                      :disabled="loading.getConfiguration || loading.configureModule"
+                      ref="MESH_PASSWORD"
+                      type="password"
+                  >
+                  </cv-text-input>
                 </template>
               </cv-accordion-item>
             </cv-accordion>
@@ -125,6 +157,9 @@ export default {
       host: "",
       isLetsEncryptEnabled: false,
       isHttpToHttpsEnabled: true,
+      MESH_HOST: '',
+      MESH_PASSWORD: '',
+      MESH_USER: '',
       loading: {
         getConfiguration: false,
         configureModule: false,
