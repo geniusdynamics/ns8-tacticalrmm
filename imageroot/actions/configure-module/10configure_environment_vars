@@ -41,5 +41,13 @@ tactical_config = {
 }
 agent.write_envfile("tactical-init-config.env", tactical_config)
 
+agent.set_env('MESH_HOST', MESH_HOST)
+agent.set_env('MESH_USER', MESH_USER)
+agent.set_env('MESH_PASS', MESH_PASS)
+agent.set_env('MESH_PERSISTENT_CONFIG', MESH_PERSISTENT_CONFIG)
+agent.set_env('API_HOST', API_HOST)
+agent.set_env('TRMM_USER', TACTICAL_USER)
+agent.set_env('TRMM_PASS', TACTICAL_PASSWORD)
+agent.set_env('APP_HOST', 'https://'+HOST)
 # just before starting systemd unit
 #agent.dump_env()
