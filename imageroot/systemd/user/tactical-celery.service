@@ -1,0 +1,32 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman tactical-celery.service
+BindsTo=tacticalrmm.service
+After=tacticalrmm.service postgresql-app.service redis-app.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+# EnvironmentFile=%S/state/secrets/passwords.secret
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/tactical-celery.pid %t/tactical-celery.ctr-id
+ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-celery.pid \
+    --cidfile %t/tactical-celery.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-celery \
+    --volume tactical_data:/opt/tactical:Z \
+    ${TACTICAL_IMAGE} tactical-celery
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-celery.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-celery.ctr-id
+ExecReload=/usr/bin/podman kill -s HUP tactical-celery
+SyslogIdentifier=%u
+PIDFile=%t/tactical-celery.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
