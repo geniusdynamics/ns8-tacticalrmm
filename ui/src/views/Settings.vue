@@ -170,6 +170,9 @@ export default {
         host: "",
         lets_encrypt: "",
         http2https: "",
+        MESH_HOST: '',
+        MESH_PASSWORD: '',
+        MESH_USER: '',
       },
     };
   },
@@ -306,6 +309,9 @@ export default {
             host: this.host,
             lets_encrypt: this.isLetsEncryptEnabled,
             http2https: this.isHttpToHttpsEnabled,
+            MESH_HOST: this.MESH_HOST,
+            MESH_USER: this.MESH_USER,
+            MESH_PASSWORD: this.MESH_PASSWORD,
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
