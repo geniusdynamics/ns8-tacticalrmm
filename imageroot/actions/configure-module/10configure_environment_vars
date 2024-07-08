@@ -16,11 +16,13 @@ data = json.load(sys.stdin)
 #This is specific to you module, so you need to change it accordingly.
 HOST = data.get('host')
 
-MESH_HOST = data.get('MESH_HOST', 'https://mesh'+HOST)
+MESH_HOST = data.get('MESH_HOST', 'https://mesh.'+HOST)
 MESH_USER = data.get('MESH_USER', 'meshadmin')
 MESH_PASS = data.get('MESH_PASS', 'password')
 MESH_PERSISTENT_CONFIG = data.get('MESH_PERSISTENT_CONFIG', '0')
-
+API_HOST = data.get('API_HOST', 'https://api.'+HOST)
+TACTICAL_USER = data.get('TACTICAL_USER', 'admin')
+TACTICAL_PASSWORD = data.get('TACTICAL_PASSWORD', 'password')
 mesh_config = {
     'MESH_HOST': MESH_HOST,
     'MESH_USER': MESH_USER,
@@ -28,6 +30,16 @@ mesh_config = {
     'MESH_PERSISTENT_CONFIG': MESH_PERSISTENT_CONFIG
 }
 agent.write_envfile("mesh-config.env", mesh_config)
+
+tactical_config = {
+    'API_HOST': API_HOST,
+    'TRMM_USER': TACTICAL_USER,
+    'TRMM_PASS': TACTICAL_PASSWORD,
+    "APP_HOST": "https://"+HOST,
+    "MESH_HOST": MESH_HOST,
+    "MESH_USER": MESH_USER
+}
+agent.write_envfile("tactical-init-config.env", tactical_config)
 
 # just before starting systemd unit
 #agent.dump_env()

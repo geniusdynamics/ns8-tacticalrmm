@@ -32,7 +32,36 @@
               :disabled="loading.getConfiguration || loading.configureModule"
               ref="host"
             >
+            <cv-text-input
+              :label="$t('API HOST')"
+              placeholder="api.example.org"
+              v-model.trim="API_HOST"
+              class="mg-bottom"
+              :invalid-message="$t(error.API_HOST)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="API_HOST"
+            >
             </cv-text-input>
+              <cv-text-input
+                  :label="$t('TACTICAL USERNAME')"
+                  placeholder="username"
+                  v-model="TACTICAL_USER"
+                  class="mg-bottom"
+                  :invalid-message="$t(error.TACTICAL_USER)"
+                  :disabled="loading.getConfiguration || loading.configureModule"
+                  ref="TACTICAL_USER"
+              >
+              </cv-text-input>
+              <cv-text-input
+                  :label="$t('TACTICAL PASSWORD')"
+                  placeholder="username"
+                  v-model="TACTICAL_PASSWORD"
+                  class="mg-bottom"
+                  :invalid-message="$t(error.TACTICAL_PASSWORD)"
+                  :disabled="loading.getConfiguration || loading.configureModule"
+                  ref="TACTICAL_PASSWORD"
+              >
+              </cv-text-input>
             <cv-toggle
               value="letsEncrypt"
               :label="$t('settings.lets_encrypt')"
@@ -160,6 +189,9 @@ export default {
       MESH_HOST: '',
       MESH_PASSWORD: '',
       MESH_USER: '',
+      API_HOST: '',
+      TACTICAL_USER: '',
+      TACTICAL_PASSWORD: '',
       loading: {
         getConfiguration: false,
         configureModule: false,
@@ -173,6 +205,9 @@ export default {
         MESH_HOST: '',
         MESH_PASSWORD: '',
         MESH_USER: '',
+        API_HOST: '',
+        TACTICAL_USER: '',
+        TACTICAL_PASSWORD: '',
       },
     };
   },
@@ -312,6 +347,10 @@ export default {
             MESH_HOST: this.MESH_HOST,
             MESH_USER: this.MESH_USER,
             MESH_PASSWORD: this.MESH_PASSWORD,
+            API_HOST: this.API_HOST,
+            TACTICAL_USER: this.TACTICAL_USER,
+            TACTICAL_PASSWORD: this.TACTICAL_PASSWORD,
+
           },
           extra: {
             title: this.$t("settings.instance_configuration", {

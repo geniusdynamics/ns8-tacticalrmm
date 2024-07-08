@@ -53,5 +53,11 @@ mesh_central_db = {
     "MONGODB_PASSWORD": MONGO_INITDB_ROOT_PASSWORD,
 }
 agent.write_envfile("meshcentral-db.env", mesh_central_db)
+
+tactical_init = {
+    "POSTGRES_USER": POSTGRES_USER,
+    "POSTGRES_PASS": POSTGRES_PASSWORD,
+}
+agent.write_envfile("tactical-init-db.env", tactical_init)
 # just before starting systemd unit
 #agent.dump_env()

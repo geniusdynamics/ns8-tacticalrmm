@@ -1,0 +1,37 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman tactical-init.service
+BindsTo=tacticalrmm.service
+After=tacticalrmm.service postgresql-app.service redis-app.service mongodb-app.service tactical-meshcentral.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+# EnvironmentFile=%S/state/secrets/passwords.secret
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/tactical-init.pid %t/tactical-init.ctr-id
+ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-init.pid \
+    --cidfile %t/tactical-init.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-init \
+    --volume tactical_data:/opt/tactical:Z \
+    --volume mesh_data:/meshcentral-data:Z \
+    --volume mongo_data:/mongo/data/db:Z \
+    --volume redis_data:/redis/data:Z \
+    --env-file=%S/state/tactical-init-db.env \
+    --env-file=%S/state/tactical-init-config.env \
+    ${TACTICAL_IMAGE} tactical-init
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-init.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-init.ctr-id
+ExecReload=/usr/bin/podman kill -s HUP tactical-init
+SyslogIdentifier=%u
+PIDFile=%t/tactical-init.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
