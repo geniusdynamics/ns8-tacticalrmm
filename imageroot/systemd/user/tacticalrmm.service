@@ -10,8 +10,8 @@
 
 [Unit]
 Description=Podman tacticalrmm.service
-Requires=postgresql-app.service redis-app.service mongodb-app.service tactical-meshcentral.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service
-Before=postgresql-app.service redis-app.service mongodb-app.service tactical-meshcentral.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service
+Requires=postgresql-app.service redis-app.service mongodb-app.service tactical-meshcentral.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service tactical-celerybeat.service
+Before=postgresql-app.service redis-app.service mongodb-app.service tactical-meshcentral.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service tactical-celerybeat.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
