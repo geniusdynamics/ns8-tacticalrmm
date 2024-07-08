@@ -10,8 +10,8 @@
 
 [Unit]
 Description=Podman tacticalrmm.service
-Requires=postgresql-app.service tacticalrmm-app.service
-Before=postgresql-app.service tacticalrmm-app.service
+Requires=postgresql-app.service redis-app.service tacticalrmm-app.service
+Before=postgresql-app.service redis-app.service tacticalrmm-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n

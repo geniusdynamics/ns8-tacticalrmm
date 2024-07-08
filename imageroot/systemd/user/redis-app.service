@@ -1,0 +1,32 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman redis-app.service
+BindsTo=tacticalrmm.service
+After=tacticalrmm.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+# EnvironmentFile=%S/state/secrets/passwords.secret
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/redis-app.pid %t/redis-app.ctr-id
+ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/redis-app.pid \
+    --cidfile %t/redis-app.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name redis-app \
+    --volume postgres-data:/data:Z \
+    ${REDIS_IMAGE}
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/redis-app.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/redis-app.ctr-id
+ExecReload=/usr/bin/podman kill -s HUP redis-app
+SyslogIdentifier=%u
+PIDFile=%t/redis-app.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
