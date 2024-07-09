@@ -61,6 +61,7 @@
                   :invalid-message="$t(error.TACTICAL_PASSWORD)"
                   :disabled="loading.getConfiguration || loading.configureModule"
                   ref="TACTICAL_PASSWORD"
+                  type="password"
               >
               </cv-text-input>
             <cv-toggle
