@@ -16,6 +16,7 @@ EnvironmentFile=%S/state/mongo.env
 # EnvironmentFile=%S/state/secrets/passwords.secret
 Restart=always
 TimeoutStopSec=70
+TimeoutStartSec=300
 ExecStartPre=/bin/rm -f %t/tactical-meshcentral.pid %t/tactical-meshcentral.ctr-id
 ExecStartPre=/bin/mkdir -p %S/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-meshcentral.pid \

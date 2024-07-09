@@ -14,6 +14,7 @@ EnvironmentFile=%S/state/environment
 # EnvironmentFile=%S/state/secrets/passwords.secret
 Restart=always
 TimeoutStopSec=70
+TimeoutStartSec=300
 ExecStartPre=/bin/rm -f %t/tactical-celerybeat.pid %t/tactical-celerybeat.ctr-id
 ExecStartPre=/bin/mkdir -p %S/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-celerybeat.pid \
