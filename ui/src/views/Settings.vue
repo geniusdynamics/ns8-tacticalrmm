@@ -277,6 +277,13 @@ export default {
       this.host = config.host;
       this.isLetsEncryptEnabled = config.lets_encrypt;
       this.isHttpToHttpsEnabled = config.http2https;
+      this.MESH_HOST = config.MESH_HOST;
+      this.MESH_USER = config.MESH_USER;
+      this.MESH_PASSWORD = config.MESH_PASSWORD;
+      this.API_HOST = config.API_HOST;
+      this.TACTICAL_USER = config.TACTICAL_USER;
+      this.TACTICAL_PASSWORD = config.TACTICAL_PASSWORD;
+
 
       this.loading.getConfiguration = false;
       this.focusElement("host");
