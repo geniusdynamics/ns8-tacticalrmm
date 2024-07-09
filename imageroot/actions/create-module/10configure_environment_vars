@@ -51,6 +51,7 @@ agent.write_envfile("mongo.env", mongo_config)
 mesh_central_db = {
     "MONGODB_USER": MONGO_INITDB_ROOT_USERNAME,
     "MONGODB_PASSWORD": MONGO_INITDB_ROOT_PASSWORD,
+    "MONGODB_HOST": "mongodb-app",
 }
 agent.write_envfile("meshcentral-db.env", mesh_central_db)
 
