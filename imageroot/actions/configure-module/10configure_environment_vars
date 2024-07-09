@@ -50,4 +50,4 @@ agent.set_env('TRMM_USER', TACTICAL_USER)
 agent.set_env('TRMM_PASS', TACTICAL_PASSWORD)
 agent.set_env('APP_HOST', 'https://'+HOST)
 # just before starting systemd unit
-#agent.dump_env()
+agent.dump_env()

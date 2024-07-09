@@ -21,6 +21,14 @@ config = {}
 config["host"] = os.getenv("TRAEFIK_HOST","")
 config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
 config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
+config["API_HOST"] = os.getenv("API_HOST","")
+config["TRMM_USER"] = os.getenv("TRMM_USER","")
+config["TRMM_PASS"] = os.getenv("TRMM_PASS","")
+config["APP_HOST"] = os.getenv("APP_HOST","")
+config["MESH_HOST"] = os.getenv("MESH_HOST","")
+config["MESH_USER"] = os.getenv("MESH_USER","")
+config["MESH_PASS"] = os.getenv("MESH_PASS","")
+
 
 # Dump the configuration to stdout
 json.dump(config, fp=sys.stdout)
