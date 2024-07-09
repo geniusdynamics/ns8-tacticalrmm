@@ -1,19 +1,19 @@
 {
   "name": "tacticalrmm",
   "description": {
-    "en": "My tacticalrmm module"
+    "en": "Tactical RMM is a remote monitoring & management tool built with Django, Vue and Golang"
   },
   "categories": [],
   "authors": [
     {
-      "name": "Name Surname",
-      "email": "author@yourmail.org"
+      "name": "Kemboi Elvis",
+      "email": "kemboielvis@genius.ke"
     }
   ],
   "docs": {
     "documentation_url": "https://docs.tacticalrmm.com/",
-    "bug_url": "https://github.com/NethServer/dev",
-    "code_url": "https://github.com/author/ns8-tacticalrmm"
+    "bug_url": "https://github.com/geniusdynamics/dev",
+    "code_url": "https://github.com/geniusdynamics/ns8-tacticalrmm"
   },
-  "source": "ghcr.io/nethserver/tacticalrmm"
+  "source": "ghcr.io/geniusdynamics/tacticalrmm"
 }
