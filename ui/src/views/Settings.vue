@@ -32,6 +32,7 @@
               :disabled="loading.getConfiguration || loading.configureModule"
               ref="host"
             >
+            </cv-text-input>
             <cv-text-input
               :label="$t('API HOST')"
               placeholder="api.example.org"
