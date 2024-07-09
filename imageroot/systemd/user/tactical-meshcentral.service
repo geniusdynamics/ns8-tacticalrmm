@@ -23,9 +23,8 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-meshcentral.pid \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-meshcentral \
     --volume tactical_data:/opt/tactical:Z \
     --volume mesh_data:/home/node/app/meshcentral-data:Z \
-    --env-file=%S/state/meshcentral-db.env \
     --env-file=%S/state/mesh-config.env \
-    --env MONGO_URL=mongodb://${MONGODB_USER}:${MONGODB_PASS}@mongodb-app:27017/tacticalrmm \
+    --env MONGO_URL=mongodb://${MONGODB_USER}:${MONGODB_PASS}@mongodb-app/tacticalrmm \
     ${TACTICAL_MESHCENTRAL_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-meshcentral.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-meshcentral.ctr-id
