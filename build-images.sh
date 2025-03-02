@@ -44,7 +44,7 @@ buildah add "${container}" ui/dist /ui
 # tcp-ports-demand=1 number of tcp Port to reserve , 1 is the minimum, can be udp or tcp
 buildah config --entrypoint=/ \
 	--label="org.nethserver.authorizations=traefik@node:routeadm" \
-	--label="org.nethserver.tcp-ports-demand=1" \
+	--label="org.nethserver.tcp-ports-demand=2" \
 	--label="org.nethserver.rootfull=0" \
 	--label="org.nethserver.images=docker.io/postgres:13-alpine docker.io/redis:6.0-alpine docker.io/tacticalrmm/tactical:${version} docker.io/tacticalrmm/tactical-nats:${version} docker.io/tacticalrmm/tactical-meshcentral:${version} docker.io/mongo:4.4 docker.io/tacticalrmm/tactical-frontend:${version}" \
 	"${container}"
