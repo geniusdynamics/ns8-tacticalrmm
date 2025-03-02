@@ -43,27 +43,60 @@
               ref="API_HOST"
             >
             </cv-text-input>
-              <cv-text-input
-                  :label="$t('TACTICAL USERNAME')"
-                  placeholder="username"
-                  v-model="TACTICAL_USER"
-                  class="mg-bottom"
-                  :invalid-message="$t(error.TACTICAL_USER)"
-                  :disabled="loading.getConfiguration || loading.configureModule"
-                  ref="TACTICAL_USER"
-              >
-              </cv-text-input>
-              <cv-text-input
-                  :label="$t('TACTICAL PASSWORD')"
-                  placeholder="username"
-                  v-model="TACTICAL_PASSWORD"
-                  class="mg-bottom"
-                  :invalid-message="$t(error.TACTICAL_PASSWORD)"
-                  :disabled="loading.getConfiguration || loading.configureModule"
-                  ref="TACTICAL_PASSWORD"
-                  type="password"
-              >
-              </cv-text-input>
+            <cv-text-input
+              :label="$t('TACTICAL USERNAME')"
+              placeholder="username"
+              v-model="TACTICAL_USER"
+              class="mg-bottom"
+              :invalid-message="$t(error.TACTICAL_USER)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="TACTICAL_USER"
+            >
+            </cv-text-input>
+            <cv-text-input
+              :label="$t('TACTICAL PASSWORD')"
+              placeholder="username"
+              v-model="TACTICAL_PASSWORD"
+              class="mg-bottom"
+              :invalid-message="$t(error.TACTICAL_PASSWORD)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="TACTICAL_PASSWORD"
+              type="password"
+            >
+            </cv-text-input>
+
+            <cv-text-input
+              :label="$t('Mesh Central Host')"
+              placeholder="mesh.example.org"
+              v-model.trim="MESH_HOST"
+              class="mg-bottom"
+              :invalid-message="$t(error.MESH_HOST)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="MESH_HOST"
+            >
+            </cv-text-input>
+
+            <cv-text-input
+              :label="$t('Mesh Central User')"
+              placeholder="user"
+              v-model="MESH_USER"
+              class="mg-bottom"
+              :invalid-message="$t(error.MESH_USER)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="MESH_USER"
+            >
+            </cv-text-input>
+            <cv-text-input
+              :label="$t('Mesh Central Password')"
+              placeholder="password"
+              v-model="MESH_PASSWORD"
+              class="mg-bottom"
+              :invalid-message="$t(error.MESH_PASSWORD)"
+              :disabled="loading.getConfiguration || loading.configureModule"
+              ref="MESH_PASSWORD"
+              type="password"
+            >
+            </cv-text-input>
             <cv-toggle
               value="letsEncrypt"
               :label="$t('settings.lets_encrypt')"
@@ -92,41 +125,47 @@
                 $t("settings.enabled")
               }}</template>
             </cv-toggle>
-              <!-- advanced options -->
+            <!-- advanced options -->
             <cv-accordion ref="accordion" class="maxwidth mg-bottom">
               <cv-accordion-item :open="toggleAccordion[0]">
                 <template slot="title">{{ $t("settings.advanced") }}</template>
                 <template slot="content">
                   <cv-text-input
-                      :label="$t('Mesh Central Host')"
-                      placeholder="mesh.example.org"
-                      v-model.trim="MESH_HOST"
-                      class="mg-bottom"
-                      :invalid-message="$t(error.MESH_HOST)"
-                      :disabled="loading.getConfiguration || loading.configureModule"
-                      ref="MESH_HOST"
+                    :label="$t('Mesh Central Host')"
+                    placeholder="mesh.example.org"
+                    v-model.trim="MESH_HOST"
+                    class="mg-bottom"
+                    :invalid-message="$t(error.MESH_HOST)"
+                    :disabled="
+                      loading.getConfiguration || loading.configureModule
+                    "
+                    ref="MESH_HOST"
                   >
                   </cv-text-input>
 
                   <cv-text-input
-                      :label="$t('Mesh Central User')"
-                      placeholder="user"
-                      v-model="MESH_USER"
-                      class="mg-bottom"
-                      :invalid-message="$t(error.MESH_USER)"
-                      :disabled="loading.getConfiguration || loading.configureModule"
-                      ref="MESH_USER"
+                    :label="$t('Mesh Central User')"
+                    placeholder="user"
+                    v-model="MESH_USER"
+                    class="mg-bottom"
+                    :invalid-message="$t(error.MESH_USER)"
+                    :disabled="
+                      loading.getConfiguration || loading.configureModule
+                    "
+                    ref="MESH_USER"
                   >
                   </cv-text-input>
                   <cv-text-input
-                      :label="$t('Mesh Central Password')"
-                      placeholder="password"
-                      v-model="MESH_PASSWORD"
-                      class="mg-bottom"
-                      :invalid-message="$t(error.MESH_PASSWORD)"
-                      :disabled="loading.getConfiguration || loading.configureModule"
-                      ref="MESH_PASSWORD"
-                      type="password"
+                    :label="$t('Mesh Central Password')"
+                    placeholder="password"
+                    v-model="MESH_PASSWORD"
+                    class="mg-bottom"
+                    :invalid-message="$t(error.MESH_PASSWORD)"
+                    :disabled="
+                      loading.getConfiguration || loading.configureModule
+                    "
+                    ref="MESH_PASSWORD"
+                    type="password"
                   >
                   </cv-text-input>
                 </template>
@@ -188,12 +227,12 @@ export default {
       host: "",
       isLetsEncryptEnabled: false,
       isHttpToHttpsEnabled: true,
-      MESH_HOST: '',
-      MESH_PASSWORD: '',
-      MESH_USER: '',
-      API_HOST: '',
-      TACTICAL_USER: '',
-      TACTICAL_PASSWORD: '',
+      MESH_HOST: "",
+      MESH_PASSWORD: "",
+      MESH_USER: "",
+      API_HOST: "",
+      TACTICAL_USER: "",
+      TACTICAL_PASSWORD: "",
       loading: {
         getConfiguration: false,
         configureModule: false,
@@ -204,12 +243,12 @@ export default {
         host: "",
         lets_encrypt: "",
         http2https: "",
-        MESH_HOST: '',
-        MESH_PASSWORD: '',
-        MESH_USER: '',
-        API_HOST: '',
-        TACTICAL_USER: '',
-        TACTICAL_PASSWORD: '',
+        MESH_HOST: "",
+        MESH_PASSWORD: "",
+        MESH_USER: "",
+        API_HOST: "",
+        TACTICAL_USER: "",
+        TACTICAL_PASSWORD: "",
       },
     };
   },
@@ -239,13 +278,13 @@ export default {
       // register to task error
       this.core.$root.$once(
         `${taskAction}-aborted-${eventId}`,
-        this.getConfigurationAborted
+        this.getConfigurationAborted,
       );
 
       // register to task completion
       this.core.$root.$once(
         `${taskAction}-completed-${eventId}`,
-        this.getConfigurationCompleted
+        this.getConfigurationCompleted,
       );
 
       const res = await to(
@@ -256,7 +295,7 @@ export default {
             isNotificationHidden: true,
             eventId,
           },
-        })
+        }),
       );
       const err = res[0];
 
@@ -283,7 +322,6 @@ export default {
       this.API_HOST = config.API_HOST;
       this.TACTICAL_USER = config.TACTICAL_USER;
       this.TACTICAL_PASSWORD = config.TACTICAL_PASSWORD;
-
 
       this.loading.getConfiguration = false;
       this.focusElement("host");
@@ -332,19 +370,19 @@ export default {
       // register to task error
       this.core.$root.$once(
         `${taskAction}-aborted-${eventId}`,
-        this.configureModuleAborted
+        this.configureModuleAborted,
       );
 
       // register to task validation
       this.core.$root.$once(
         `${taskAction}-validation-failed-${eventId}`,
-        this.configureModuleValidationFailed
+        this.configureModuleValidationFailed,
       );
 
       // register to task completion
       this.core.$root.$once(
         `${taskAction}-completed-${eventId}`,
-        this.configureModuleCompleted
+        this.configureModuleCompleted,
       );
       const res = await to(
         this.createModuleTaskForApp(this.instanceName, {
@@ -359,7 +397,6 @@ export default {
             API_HOST: this.API_HOST,
             TACTICAL_USER: this.TACTICAL_USER,
             TACTICAL_PASSWORD: this.TACTICAL_PASSWORD,
-
           },
           extra: {
             title: this.$t("settings.instance_configuration", {
@@ -368,7 +405,7 @@ export default {
             description: this.$t("settings.configuring"),
             eventId,
           },
-        })
+        }),
       );
       const err = res[0];
 
