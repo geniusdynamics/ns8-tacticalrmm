@@ -37,23 +37,6 @@ posgtres_config = {
 }
 agent.write_envfile("database.env", posgtres_config)
 
-MONGO_INITDB_ROOT_USERNAME = data.get('MONGO_INITDB_ROOT_USERNAME', 'tacticalrmm')
-MONGO_INITDB_ROOT_PASSWORD = generate_random_password(16)
-MONGO_INITDB_DATABASE = data.get('MONGO_INITDB_DATABASE', 'tacticalrmm')
-
-mongo_config = {
-    'MONGO_INITDB_ROOT_USERNAME': MONGO_INITDB_ROOT_USERNAME,
-    'MONGO_INITDB_ROOT_PASSWORD': MONGO_INITDB_ROOT_PASSWORD,
-    'MONGO_INITDB_DATABASE': MONGO_INITDB_DATABASE
-}
-agent.write_envfile("mongo.env", mongo_config)
-
-mesh_central_db = {
-    "MONGODB_USER": MONGO_INITDB_ROOT_USERNAME,
-    "MONGODB_PASSWORD": MONGO_INITDB_ROOT_PASSWORD,
-    "MONGODB_HOST": "mongodb-app",
-}
-agent.write_envfile("meshcentral-db.env", mesh_central_db)
 
 tactical_init = {
     "POSTGRES_USER": POSTGRES_USER,
