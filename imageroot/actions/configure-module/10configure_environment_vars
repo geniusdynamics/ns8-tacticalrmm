@@ -16,11 +16,11 @@ data = json.load(sys.stdin)
 #This is specific to you module, so you need to change it accordingly.
 HOST = data.get('host')
 
-MESH_HOST = data.get('MESH_HOST', 'https://mesh.'+HOST)
-MESH_USER = data.get('MESH_USER', 'meshadmin')
-MESH_PASS = data.get('MESH_PASS', 'password')
+MESH_HOST = data.get('MESH_HOST', )
+MESH_USER = data.get('MESH_USER', )
+MESH_PASS = data.get('MESH_PASS',)
 MESH_PERSISTENT_CONFIG = data.get('MESH_PERSISTENT_CONFIG', '0')
-API_HOST = data.get('API_HOST', 'https://api.'+HOST)
+API_HOST = data.get('API_HOST')
 TACTICAL_USER = data.get('TACTICAL_USER', 'admin')
 TACTICAL_PASSWORD = data.get('TACTICAL_PASSWORD', 'password')
 mesh_config = {
@@ -37,17 +37,18 @@ tactical_config = {
     'TRMM_PASS': TACTICAL_PASSWORD,
     "APP_HOST": "https://"+HOST,
     "MESH_HOST": MESH_HOST,
-    "MESH_USER": MESH_USER
+    "MESH_USER": MESH_USER,
+    "MESH_PASS": MESH_PASS
 }
 agent.write_envfile("tactical-init-config.env", tactical_config)
 
-agent.set_env('MESH_HOST', MESH_HOST)
-agent.set_env('MESH_USER', MESH_USER)
-agent.set_env('MESH_PASS', MESH_PASS)
-agent.set_env('MESH_PERSISTENT_CONFIG', MESH_PERSISTENT_CONFIG)
-agent.set_env('API_HOST', API_HOST)
-agent.set_env('TRMM_USER', TACTICAL_USER)
-agent.set_env('TRMM_PASS', TACTICAL_PASSWORD)
-agent.set_env('APP_HOST', 'https://'+HOST)
+# agent.set_env('MESH_HOST', MESH_HOST)
+# agent.set_env('MESH_USER', MESH_USER)
+# agent.set_env('MESH_PASS', MESH_PASS)
+# agent.set_env('MESH_PERSISTENT_CONFIG', MESH_PERSISTENT_CONFIG)
+# agent.set_env('API_HOST', API_HOST)
+# agent.set_env('TRMM_USER', TACTICAL_USER)
+# agent.set_env('TRMM_PASS', TACTICAL_PASSWORD)
+# agent.set_env('APP_HOST', 'https://'+HOST)
 # just before starting systemd unit
 agent.dump_env()
