@@ -29,7 +29,7 @@ mesh_config = {
     'MESH_PASS': MESH_PASS,
     'MESH_PERSISTENT_CONFIG': MESH_PERSISTENT_CONFIG
 }
-agent.write_envfile("mesh-config.env", mesh_config)
+agent.write_envfile("mesh_config.env", mesh_config)
 
 tactical_config = {
     'API_HOST': API_HOST,
@@ -40,7 +40,7 @@ tactical_config = {
     "MESH_USER": MESH_USER,
     "MESH_PASS": MESH_PASS
 }
-agent.write_envfile("tactical-init-config.env", tactical_config)
+agent.write_envfile("tactical.env", tactical_config)
 
 # agent.set_env('MESH_HOST', MESH_HOST)
 # agent.set_env('MESH_USER', MESH_USER)

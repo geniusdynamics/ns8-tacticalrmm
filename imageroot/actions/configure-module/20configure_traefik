@@ -19,13 +19,14 @@ data = json.load(sys.stdin)
 host = data.get("host")
 h2hs = data.get("http2https", True)
 le = data.get("lets_encrypt", False)
+API_HOST = data.get('API_HOST')
 
 # Talk with agent using file descriptor.
 # Setup configuration from user input.
 agent.set_env("TRAEFIK_HOST", host)
 agent.set_env("TRAEFIK_HTTP2HTTPS", h2hs)
 agent.set_env("TRAEFIK_LETS_ENCRYPT", le)
-
+agent.set_env("API_HOST", API_HOST)
 # Make sure everything is saved inside the environment file
 # just before starting systemd unit
 agent.dump_env()
@@ -47,5 +48,16 @@ response = agent.tasks.run(
     },
 )
 
+response = agent.tasks.run(
+    agent_id=agent.resolve_agent_id('traefik@node'),
+    action='set-route',
+    data={
+        'instance': os.environ['MODULE_ID'],
+        'url':  'http://127.0.0.1:' + os.environ["API_TCP_PORT"],
+        'host': API_HOST,
+        'http2https': h2hs,
+        'lets_encrypt': le
+    },
+)
 # Check if traefik configuration has been successfull
 agent.assert_exp(response['exit_code'] == 0)
