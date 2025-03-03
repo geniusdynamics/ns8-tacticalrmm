@@ -20,8 +20,8 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-nats.pid \
     --cidfile %t/tactical-nats.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-nats \
     --volume tactical_data:/opt/tactical:Z \
-    --env API_HOST=${API_HOST} \
-    ${TACTICAL_NATS_IMAGE}
+    --env-file=%S/state/tactical.env \
+     ${TACTICAL_NATS_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-nats.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-nats.ctr-id
 ExecReload=/usr/bin/podman kill -s HUP tactical-nats

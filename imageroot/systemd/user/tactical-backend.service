@@ -6,7 +6,7 @@
 [Unit]
 Description=Podman tactical-backend.service
 BindsTo=tacticalrmm.service
-After=tacticalrmm.service postgresql-app.service tactical-init.service
+After=tacticalrmm.service postgresql-app.service 
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n

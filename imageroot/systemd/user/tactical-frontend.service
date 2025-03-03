@@ -6,8 +6,7 @@
 [Unit]
 Description=Podman tactical-frontend.service
 BindsTo=tacticalrmm.service
-After=tacticalrmm.service tactical-init.service tactical-backend.service
-
+After=tacticalrmm.service 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%S/state/environment
@@ -20,7 +19,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-frontend.pid \
     --cidfile %t/tactical-frontend.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-frontend \
     --volume tactical_data:/opt/tactical:Z \
-    --env API_HOST=${API_HOST} \
+   --env-file=%S/state/tactical.env \
     ${TACTICAL_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-frontend.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-frontend.ctr-id
