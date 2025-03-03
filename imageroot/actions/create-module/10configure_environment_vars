@@ -14,7 +14,9 @@ import os
 # If parsing fails, output everything to stderr
 data = json.load(sys.stdin)
 
-#This is specific to you module, so you need to change it accordingly.
+# split port and set in env
+port = os.environ["TCP_PORTS"].split(',')
+agent.set_env("API_TCP_PORT", port[1])
 
 #This is specific to you module, so you need to change it accordingly.
 
