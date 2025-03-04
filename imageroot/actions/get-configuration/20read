@@ -21,13 +21,26 @@ config = {}
 config["host"] = os.getenv("TRAEFIK_HOST","")
 config["http2https"] = os.getenv("TRAEFIK_HTTP2HTTPS") == "True"
 config["lets_encrypt"] = os.getenv("TRAEFIK_LETS_ENCRYPT") == "True"
-config["API_HOST"] = os.getenv("API_HOST","")
-config["TRMM_USER"] = os.getenv("TRMM_USER","")
-config["TRMM_PASS"] = os.getenv("TRMM_PASS","")
-config["APP_HOST"] = os.getenv("APP_HOST","")
-config["MESH_HOST"] = os.getenv("MESH_HOST","")
-config["MESH_USER"] = os.getenv("MESH_USER","")
-config["MESH_PASS"] = os.getenv("MESH_PASS","")
+# config["API_HOST"] = os.getenv("API_HOST","")
+# config["TRMM_USER"] = os.getenv("TRMM_USER","")
+# config["TRMM_PASS"] = os.getenv("TRMM_PASS","")
+# config["APP_HOST"] = os.getenv("APP_HOST","")
+# config["MESH_HOST"] = os.getenv("MESH_HOST","")
+# config["MESH_USER"] = os.getenv("MESH_USER","")
+# config["MESH_PASS"] = os.getenv("MESH_PASS","")
+
+if os.path.exists('mesh_config.env'):
+    data = agent.read_envfile('mesh_config.env')
+    config['MESH_HOST'] = data.get('MESH_HOST')
+    config['MESH_USER'] = data.get("MESH_USER")
+    config['MESH_PASS'] = data.get('MESH_PASS')
+
+if os.path.exists('tactical.env'):
+    data = agent.read_envfile('tactical.env')
+    config["API_HOST"] = data.get("API_HOST","")
+    config["TRMM_USER"] = data.get("TRMM_USER","")
+    config["TRMM_PASS"] = data.get("TRMM_PASS","")
+
 
 
 # Dump the configuration to stdout
