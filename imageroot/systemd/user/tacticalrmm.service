@@ -10,7 +10,7 @@
 
 [Unit]
 Description=Podman tacticalrmm.service
-Wants=tactical-init.service tactical-websockets.service tactical-celerybeat.service tactical-celery.service
+Wants=tactical-init.service tactical-websockets.service tactical-celerybeat.service tactical-celery.service tactical-nats.service tactical-backend.service  tactical-frontend.service
 Requires=postgresql-app.service redis-app.service  meshcentral-app.service mongodb-app.service  nginx-app.service
 Before=postgresql-app.service redis-app.service mongodb-app.service meshcentral-app.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service tactical-celerybeat.service tactical-celery.service
 
@@ -23,7 +23,7 @@ ExecStartPre=/bin/rm -f %t/tacticalrmm.pid %t/tacticalrmm.pod-id
 ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/tacticalrmm.pid \
     --pod-id-file %t/tacticalrmm.pod-id \
     --name tacticalrmm \
-    --publish 127.0.0.1:${TCP_PORT}:8080 \
+    --publish 127.0.0.1:${TCP_PORT}:80 \
     --publish 127.0.0.1:${API_TCP_PORT}:8080 \
     --publish 127.0.0.1:${MESH_TCP_PORT}:8080 \
     --replace
