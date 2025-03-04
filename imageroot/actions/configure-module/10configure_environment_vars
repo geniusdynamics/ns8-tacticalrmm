@@ -38,7 +38,8 @@ tactical_config = {
     "APP_HOST": "https://"+HOST,
     "MESH_HOST": MESH_HOST,
     "MESH_USER": MESH_USER,
-    "MESH_PASS": MESH_PASS
+    "MESH_PASS": MESH_PASS,
+    "MESH_SERVICE": MESH_HOST
 }
 agent.write_envfile("tactical.env", tactical_config)
 
