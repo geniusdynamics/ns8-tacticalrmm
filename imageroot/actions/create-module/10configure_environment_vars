@@ -56,10 +56,13 @@ tactical_init = {
     "POSTGRES_HOST": "postgresql-app",
     "REDIS_HOST": "redis-app",
     "MESH_SERVICE": "meshcentral-app",
+   }
+mesh = {
     "MONGODB_USER": MONGO_INITDB_ROOT_USERNAME,
     "MONGODB_PASSWORD": MONGO_INITDB_ROOT_PASSWORD
 
 }
+agent.write_envfile("mesh.env", mesh)
 agent.write_envfile("tactical-init-db.env", tactical_init)
 # just before starting systemd unit
 #agent.dump_env()
