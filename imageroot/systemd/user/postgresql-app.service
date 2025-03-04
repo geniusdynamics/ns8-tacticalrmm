@@ -20,7 +20,8 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/postgresql-app.pid \
     --cidfile %t/postgresql-app.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name postgresql-app \
     --env-file=%S/state/database.env \
-    --volume postgres-data:/var/lib/postgresql/data:Z \
+    --volume postrges-data-tactical:/var/lib/postgresql/data:Z \
+    --volume %S/state/restore/:/docker-entrypoint-initdb.d/:Z \
     --env TZ=UTC \
     ${POSTGRES_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/postgresql-app.ctr-id -t 10

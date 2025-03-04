@@ -28,8 +28,8 @@ def generate_random_password(length):
 
 # Configure POSTGRES DB
 
-POSTGRES_DB = data.get('POSTGRES_DB', 'tacticalrmm')
-POSTGRES_USER = data.get('POSTGRES_USER', 'tacticalrmm')
+POSTGRES_DB =  "tacticalrmm"
+POSTGRES_USER =  "postgres"
 POSTGRES_PASSWORD = generate_random_password(16)
 
 posgtres_config = {
