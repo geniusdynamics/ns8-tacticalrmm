@@ -6,7 +6,7 @@
 [Unit]
 Description=Podman tactical-init.service
 BindsTo=tacticalrmm.service
-After=tacticalrmm.service postgresql-app.service redis-app.service
+After=tacticalrmm.service postgresql-app.service redis-app.service meshcentral-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
