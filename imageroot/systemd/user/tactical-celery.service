@@ -5,7 +5,6 @@
 
 [Unit]
 Description=Podman tactical-celery.service
-BindsTo=tacticalrmm.service
 After=tacticalrmm.service postgresql-app.service redis-app.service 
 
 [Service]

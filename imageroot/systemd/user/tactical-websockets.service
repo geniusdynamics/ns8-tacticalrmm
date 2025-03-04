@@ -5,7 +5,6 @@
 
 [Unit]
 Description=Podman tactical-websockets.service
-BindsTo=tacticalrmm.service
 After=tacticalrmm.service postgresql-app.service tactical-backend.service
 
 [Service]
