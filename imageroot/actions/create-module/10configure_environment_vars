@@ -43,6 +43,7 @@ agent.write_envfile("database.env", posgtres_config)
 tactical_init = {
     "POSTGRES_USER": POSTGRES_USER,
     "POSTGRES_PASS": POSTGRES_PASSWORD,
+    "POSTGRES_HOST": "postgresql-app"
 }
 agent.write_envfile("tactical-init-db.env", tactical_init)
 # just before starting systemd unit
