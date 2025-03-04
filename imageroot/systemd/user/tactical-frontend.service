@@ -5,7 +5,6 @@
 
 [Unit]
 Description=Podman tactical-frontend.service
-BindsTo=tacticalrmm.service
 After=tacticalrmm.service 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n

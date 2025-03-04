@@ -5,7 +5,6 @@
 
 [Unit]
 Description=Podman tactical-nats.service
-BindsTo=tacticalrmm.service
 After=tacticalrmm.service tactical-init.service
 
 [Service]
