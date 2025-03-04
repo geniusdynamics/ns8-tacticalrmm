@@ -8,6 +8,7 @@
 import json
 import sys
 import agent
+import socket
 
 # Try to parse the stdin as JSON.
 # If parsing fails, output everything to stderr
@@ -15,6 +16,8 @@ data = json.load(sys.stdin)
 
 #This is specific to you module, so you need to change it accordingly.
 HOST = data.get('host')
+hostname = socket.gethostname()
+local_ip = socket.gethostbyname(hostname)
 
 MESH_HOST = data.get('MESH_HOST', )
 MESH_USER = data.get('MESH_USER', )
@@ -28,7 +31,8 @@ mesh_config = {
     'MESH_PASS': MESH_PASS,
     "MESH_HOST": MESH_HOST,
     'MESH_PERSISTENT_CONFIG': MESH_PERSISTENT_CONFIG,
-    "MONGODB_HOST": "mongodb-app"
+    "MONGODB_HOST": "mongodb-app",
+    "NGINX_HOST_IP": local_ip
 }
 agent.write_envfile("mesh_config.env", mesh_config)
 
