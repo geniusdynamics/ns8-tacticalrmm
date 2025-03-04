@@ -11,7 +11,7 @@
 [Unit]
 Description=Podman tacticalrmm.service
 Wants=tactical-init.service tactical-websockets.service tactical-celerybeat.service tactical-celery.service
-Requires=postgresql-app.service redis-app.service   mongodb-app.service  
+Requires=postgresql-app.service redis-app.service   mongodb-app.service  nginx-app.service
 Before=postgresql-app.service redis-app.service mongodb-app.service meshcentral-app.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service tactical-celerybeat.service tactical-celery.service
 
 [Service]

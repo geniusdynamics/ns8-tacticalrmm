@@ -42,6 +42,13 @@ tactical_config = {
 }
 agent.write_envfile("tactical.env", tactical_config)
 
+nginx_config = {
+    "APP_HOST": HOST,
+    "API_HOST": API_HOST,
+    "MESH_HOST": MESH_HOST
+}
+agent.write_envfile("nginx.env", nginx_config)
+
 # agent.set_env('MESH_HOST', MESH_HOST)
 # agent.set_env('MESH_USER', MESH_USER)
 # agent.set_env('MESH_PASS', MESH_PASS)

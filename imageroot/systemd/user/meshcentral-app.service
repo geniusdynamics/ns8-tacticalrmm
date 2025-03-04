@@ -14,6 +14,8 @@ EnvironmentFile=%S/state/environment
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/meshcentral-app.pid %t/meshcentral-app.ctr-id
+ExecStartPre=/bin/bash -c 'echo "NGINX_HOST_IP=$(hostname -I | awk \'{print $1}\')" > nginx-ip.env'
+EnvironmentFile=%S/state/nginx-ip.env
 ExecStartPre=/bin/mkdir -p %S/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/meshcentral-app.pid \
     --cidfile %t/meshcentral-app.ctr-id --cgroups=no-conmon \
@@ -22,6 +24,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/meshcentral-app.pid \
     --volume mesh_data:/home/node/app/meshcentral-data:Z \
     --env-file=%S/state/mesh_config.env \
     --env-file=%S/state/mesh.env \
+    --env-file= %S/state/nginx-ip.env \
      ${TACTICAL_MESHCENTRAL_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/meshcentral-app.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/meshcentral-app.ctr-id
