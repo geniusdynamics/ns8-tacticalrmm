@@ -1,0 +1,33 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+[Unit]
+Description=Podman meshcentral-app.service
+BindsTo=tacticalrmm.service
+After=tacticalrmm.service 
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%S/state/environment
+# EnvironmentFile=%S/state/secrets/passwords.secret
+Restart=always
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/meshcentral-app.pid %t/meshcentral-app.ctr-id
+ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/meshcentral-app.pid \
+    --cidfile %t/meshcentral-app.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name meshcentral-app \
+    --volume tactical_data:/opt/tactical:Z \
+    --volume mesh_data:/home/node/app/meshcentral-data:Z \
+    --env-file=%S/state/mesh_config.env \
+     ${TACTICAL_MESHCENTRAL_IMAGE}
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/meshcentral-app.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/meshcentral-app.ctr-id
+ExecReload=/usr/bin/podman kill -s HUP meshcentral-app
+SyslogIdentifier=%u
+PIDFile=%t/meshcentral-app.pid
+Type=forking
+
+[Install]
+WantedBy=default.target
