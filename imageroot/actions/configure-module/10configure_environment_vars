@@ -24,10 +24,11 @@ API_HOST = data.get('API_HOST')
 TACTICAL_USER = data.get('TACTICAL_USER', 'admin')
 TACTICAL_PASSWORD = data.get('TACTICAL_PASSWORD', 'password')
 mesh_config = {
-    'MESH_HOST': MESH_HOST,
     'MESH_USER': MESH_USER,
     'MESH_PASS': MESH_PASS,
-    'MESH_PERSISTENT_CONFIG': MESH_PERSISTENT_CONFIG
+    "MESH_HOST": MESH_HOST,
+    'MESH_PERSISTENT_CONFIG': MESH_PERSISTENT_CONFIG,
+    "MONGODB_HOST": "mongodb-app"
 }
 agent.write_envfile("mesh_config.env", mesh_config)
 
@@ -35,11 +36,9 @@ tactical_config = {
     'API_HOST': API_HOST,
     'TRMM_USER': TACTICAL_USER,
     'TRMM_PASS': TACTICAL_PASSWORD,
-    "APP_HOST": "https://"+HOST,
-    "MESH_HOST": MESH_HOST,
+    "APP_HOST": HOST,
     "MESH_USER": MESH_USER,
     "MESH_PASS": MESH_PASS,
-    "MESH_SERVICE": MESH_HOST
 }
 agent.write_envfile("tactical.env", tactical_config)
 
