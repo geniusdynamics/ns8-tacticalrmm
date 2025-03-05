@@ -50,7 +50,13 @@ agent.write_envfile("tactical.env", tactical_config)
 nginx_config = {
     "APP_HOST": HOST,
     "API_HOST": API_HOST,
-    "MESH_HOST": MESH_HOST
+    "MESH_HOST": MESH_HOST,
+    "NGINX_RESOLVER": local_ip,
+    "BACKEND_SERVICE": "tactical-backend",
+    "FRONTEND_SERVICE": "tactical-frontend",
+    "MESH_SERVICE": "meshcentral-app",
+    "WEBSOCKETS_SERVICE": "tactical-websockets",
+    "NATS_SERVICE": "tactical-nats"
 }
 agent.write_envfile("nginx.env", nginx_config)
 
