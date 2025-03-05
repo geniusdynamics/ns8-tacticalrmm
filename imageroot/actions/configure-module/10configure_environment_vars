@@ -43,6 +43,7 @@ tactical_config = {
     "APP_HOST": HOST,
     "MESH_USER": MESH_USER,
     "MESH_PASS": MESH_PASS,
+    "REDIS_HOST": "redis-app"
 }
 agent.write_envfile("tactical.env", tactical_config)
 
