@@ -10,12 +10,12 @@ After=tacticalrmm.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=%S/state/environment
-# EnvironmentFile=%S/state/secrets/passwords.secret
+EnvironmentFile=%E/state/environment
+# EnvironmentFile=%E/state/secrets/passwords.secret
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/redis-app.pid %t/redis-app.ctr-id
-ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStartPre=/bin/mkdir -p %E/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/redis-app.pid \
     --cidfile %t/redis-app.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name redis-app \

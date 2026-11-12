@@ -16,7 +16,7 @@ Before=postgresql-app.service redis-app.service tactical-init.service tactical-n
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=-%S/state/environment
+EnvironmentFile=-%E/state/environment
 Restart=always
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/tacticalrmm.pid %t/tacticalrmm.pod-id
