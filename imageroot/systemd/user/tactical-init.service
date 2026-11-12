@@ -10,13 +10,13 @@ After=tacticalrmm.service postgresql-app.service redis-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=%S/state/environment
-# EnvironmentFile=%S/state/secrets/passwords.secret
+EnvironmentFile=%E/state/environment
+# EnvironmentFile=%E/state/secrets/passwords.secret
 Restart=always
 TimeoutStopSec=70
 TimeoutStartSec=300
 ExecStartPre=/bin/rm -f %t/tactical-init.pid %t/tactical-init.ctr-id
-ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStartPre=/bin/mkdir -p %E/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-init.pid \
     --cidfile %t/tactical-init.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-init \
@@ -24,9 +24,9 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-init.pid \
     --volume mesh_data:/meshcentral-data:Z \
     --volume mongo_data:/mongo/data/db:Z \
     --volume redis_data:/redis/data:Z \
-    --env-file=%S/state/tactical-init-db.env \
-    --env-file=%S/state/tactical.env \
-    --env-file=%S/state/mesh_config.env \
+    --env-file=%E/state/tactical-init-db.env \
+    --env-file=%E/state/tactical.env \
+    --env-file=%E/state/mesh_config.env \
     ${TACTICAL_IMAGE} tactical-init
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-init.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-init.ctr-id

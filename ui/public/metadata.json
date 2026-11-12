@@ -6,13 +6,13 @@
   "categories": [],
   "authors": [
     {
-      "name": "Kemboi Elvis",
-      "email": "kemboielvis@genius.ke"
+      "name": "Genius Dynamics",
+      "email": "support@genius.ke"
     }
   ],
   "docs": {
     "documentation_url": "https://docs.tacticalrmm.com/",
-    "bug_url": "https://github.com/geniusdynamics/dev",
+    "bug_url": "https://github.com/geniusdynamics/ns8-tacticalrmm/issues",
     "code_url": "https://github.com/geniusdynamics/ns8-tacticalrmm"
   },
   "source": "ghcr.io/geniusdynamics/tacticalrmm"

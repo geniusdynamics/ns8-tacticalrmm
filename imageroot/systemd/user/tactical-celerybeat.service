@@ -9,13 +9,13 @@ After=tacticalrmm.service postgresql-app.service redis-app.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
-EnvironmentFile=%S/state/environment
-# EnvironmentFile=%S/state/secrets/passwords.secret
+EnvironmentFile=%E/state/environment
+# EnvironmentFile=%E/state/secrets/passwords.secret
 Restart=always
 TimeoutStopSec=70
 TimeoutStartSec=300
 ExecStartPre=/bin/rm -f %t/tactical-celerybeat.pid %t/tactical-celerybeat.ctr-id
-ExecStartPre=/bin/mkdir -p %S/state/restore/
+ExecStartPre=/bin/mkdir -p %E/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-celerybeat.pid \
     --cidfile %t/tactical-celerybeat.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-celerybeat \
