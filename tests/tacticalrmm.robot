@@ -2,7 +2,7 @@
 Library    SSHLibrary
 
 *** Variables ***
-${HOST}    .example.org
+${HOST}    tacticalrmm.example.org
 ${ADMIN_USER}    admin
 ${ADMIN_PASSWORD}    Nethesis,1234
 ${module_id}    ${EMPTY}
