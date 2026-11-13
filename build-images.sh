@@ -51,6 +51,7 @@ buildah config --entrypoint=/ \
 	--label="org.nethserver.authorizations=traefik@node:routeadm" \
 	--label="org.nethserver.tcp-ports-demand=2" \
 	--label="org.nethserver.rootfull=0" \
+    --label="org.nethserver.min-core=3.0.0" \
 	--label="org.nethserver.images=docker.io/postgres:18.7-alpine3.24 docker.io/redis:8.10.3-alpine3.23 docker.io/tacticalrmm/tactical:${app_version} docker.io/tacticalrmm/tactical-nats:${app_version} docker.io/tacticalrmm/tactical-meshcentral:${app_version} docker.io/mongo:9.0.8 docker.io/tacticalrmm/tactical-frontend:${app_version}" \
 	"${container}"
 # Commit the image
