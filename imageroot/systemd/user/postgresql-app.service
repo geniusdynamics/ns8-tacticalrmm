@@ -7,25 +7,27 @@
 Description=Podman postgresql-app.service
 BindsTo=tacticalrmm.service
 After=tacticalrmm.service
+Before=tactical-init.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%E/state/environment
 Restart=always
+RestartSec=10
 TimeoutStopSec=70
+TimeoutStartSec=300
+# Report started only when PostgreSQL accepts TCP connections
+ExecStartPost=/usr/bin/bash -c "for i in $$(seq 1 90); do /usr/bin/podman exec postgresql-app pg_isready -q -h 127.0.0.1 -U postgres && exit 0; sleep 2; done; exit 1"
 ExecStartPre=/bin/rm -f %t/postgresql-app.pid %t/postgresql-app.ctr-id
-ExecStartPre=/bin/mkdir -p %E/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/postgresql-app.pid \
     --cidfile %t/postgresql-app.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name postgresql-app \
     --env-file=%E/state/database.env \
-    --volume postrges-data-tactical:/var/lib/postgresql/data:Z \
-    --volume %E/state/restore/:/docker-entrypoint-initdb.d/:Z \
+    --volume postgres-data:/var/lib/postgresql:Z \
     --env TZ=UTC \
     ${POSTGRES_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/postgresql-app.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/postgresql-app.ctr-id
-ExecReload=/usr/bin/podman kill -s HUP postgresql-app
 SyslogIdentifier=%u
 PIDFile=%t/postgresql-app.pid
 Type=forking

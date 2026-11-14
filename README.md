@@ -1,156 +1,125 @@
 # ns8-tacticalrmm
 
-This is a template module for [NethServer 8](https://github.com/NethServer/ns8-core).
-To start a new module from it:
+Tactical RMM is a remote monitoring & management tool built with Django, Vue and Golang
 
+Module id: `tacticalrmm`. Images are pinned in `build-images.sh` and updated through reviewed changes.
 
 ## Install
 
-Instantiate the module with:
-
-```shell
+```bash
 add-module ghcr.io/geniusdynamics/tacticalrmm:latest 1
 ```
-    
 
-The output of the command will return the instance name.
-Output example:
-
-    {"module_id": "tacticalrmm1", "image_name": "tacticalrmm", "image_url": "ghcr.io/geniusdynamics/tacticalrmm:latest"}
+The command returns the instance id, for example `tacticalrmm1`. Use the id NS8 returns.
 
 ## Configure
 
-Let's assume that the mattermost instance is named `tacticalrmm1`.
-
-Launch `configure-module`, by setting the following parameters:
-- `host`: a fully qualified domain name for the application
-- `http2https`: enable or disable HTTP to HTTPS redirection (true/false)
-- `lets_encrypt`: enable or disable Let's Encrypt certificate (true/false)
-
-
-Example:
-
-```
-api-cli run configure-module --agent module/tacticalrmm1 --data - <<EOF
+```bash
+api-cli run configure-module --agent module/tacticalrmm1 --data - <<'EOF'
 {
-  "host": "tacticalrmm.domain.com",
+  "host": "tacticalrmm.example.org",
   "http2https": true,
   "lets_encrypt": false
 }
 EOF
 ```
 
-The above command will:
-- start and configure the tacticalrmm instance
-- configure a virtual host for trafik to access the instance
+| Parameter | Required | Type | Description |
+|---|---|---|---|
+| `host` | yes | string | Host name for the application, like 'tacticalrmm.domain.org' |
+| `lets_encrypt` | yes | boolean | Request a valid Let's Encrypt certificate. |
+| `http2https` | yes | boolean | Redirect all the HTTP requests to HTTPS |
+| `API_HOST` | no | string | Host name of the API. Default: `api.<host>` |
+| `MESH_HOST` | no | string | Host name of MeshCentral. Default: `mesh.<host>` |
+| `TACTICAL_USER` | no | string | Dashboard user, created at the first start. Default: `admin` |
+| `TACTICAL_PASSWORD` | no | string | Password of the dashboard user. Set it before the first start: the user is created only once. Default: random |
+| `MESH_USER` | no | string | MeshCentral admin account. Default: `meshadmin` |
+| `MESH_PASSWORD` | no | string | Password of the MeshCentral admin account. Default: random |
+
+The three host names must resolve to the node: Traefik routes each of them to the module.
+
+## Configuration output
+
+`get-configuration` returns: `host`, `lets_encrypt`, `http2https`, `API_HOST`, `MESH_HOST`, `MESH_USER`, `TACTICAL_USER`. It never returns the passwords.
+
+## Images
+
+| Image | Version |
+|---|---|
+| `docker.io/postgres` | `18.7-alpine3.24` |
+| `docker.io/redis` | `8.10.3-alpine3.23` |
+| `docker.io/tacticalrmm/tactical` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-nats` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-meshcentral` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-frontend` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-nginx` | `1.6.1` |
+
+MeshCentral keeps its data in its built-in NeDB database (volume `mesh_data`), so the module runs no MongoDB.
+
+## Network and access
+
+- Reserves 1 TCP port on the node. Traefik terminates TLS and sends the app, API and MeshCentral host names to the nginx container of the pod, which dispatches them by host name.
+- All the containers run in one pod and talk on 127.0.0.1: nginx 8000, uwsgi 8080, frontend 8081, websockets 8383, NATS 4222 and 9235, MeshCentral 4443, PostgreSQL 5432, Redis 6379.
+- Runs rootless.
+- Declares these NS8 authorizations: `traefik@node:routeadm`.
+
+## Backup
+
+The following paths are included in the NS8 backup (`imageroot/etc/state-include.conf`):
+
+- `state/tacticalrmm.pg_dump`: PostgreSQL dump written by `bin/module-dump-state`
+- `volumes/mesh_data`: MeshCentral database and certificates
+
+## Services
+
+- `postgresql-app.service`
+- `redis-app.service`
+- `tactical-backend.service`
+- `tactical-celery.service`
+- `tactical-celerybeat.service`
+- `tactical-frontend.service`
+- `tactical-init.service`: one-shot setup (migrations, first user, ready file); it stays `active (exited)`
+- `tactical-meshcentral.service`
+- `tactical-nginx.service`
+- `tactical-nats.service`
+- `tactical-websockets.service`
+- `tacticalrmm.service`: the pod
 
 ## Get the configuration
-You can retrieve the configuration with
 
-```
+```bash
 api-cli run get-configuration --agent module/tacticalrmm1
 ```
 
-## Uninstall
+## Update and uninstall
 
-To uninstall the instance:
-
-```shell
- remove-module --no-preserve tacticalrmm1
-```
-   
-
-## Update
-
-To Update the instance:
-
-```shell
- api-cli run update-module --data '{"module_url":"ghcr.io/geniusdynamics/tacticalrmm:latest","instances":["tacticalrmm1"],"force":true}'
-
-```
-   
-## Smarthost setting discovery
-
-Some configuration settings, like the smarthost setup, are not part of the
-`configure-module` action input: they are discovered by looking at some
-Redis keys.  To ensure the module is always up-to-date with the
-centralized [smarthost
-setup](https://geniusdynamics.github.io/ns8-core/core/smarthost/) every time
-tacticalrmm starts, the command `bin/discover-smarthost` runs and refreshes
-the `state/smarthost.env` file with fresh values from Redis.
-
-Furthermore if smarthost setup is changed when tacticalrmm is already
-running, the event handler `events/smarthost-changed/10reload_services`
-restarts the main module service.
-
-See also the `systemd/user/tacticalrmm.service` file.
-
-This setting discovery is just an example to understand how the module is
-expected to work: it can be rewritten or discarded completely.
-
-## Debug
-
-some CLI are needed to debug
-
-- The module runs under an agent that initiate a lot of environment variables (in /home/tacticalrmm1/.config/state), it could be nice to verify them
-on the root terminal
-
-    `runagent -m tacticalrmm1 env`
-
-- you can become runagent for testing scripts and initiate all environment variables
-  
-    `runagent -m tacticalrmm1`
-
- the path become : 
-```
-    echo $PATH
-    /home/tacticalrmm1/.config/bin:/usr/local/agent/pyenv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/usr/
+```bash
+api-cli run update-module --data '{"module_url":"ghcr.io/geniusdynamics/tacticalrmm:latest","instances":["tacticalrmm1"],"force":true}'
+remove-module --no-preserve tacticalrmm1
 ```
 
-- if you want to debug a container or see environment inside
- `runagent -m tacticalrmm1`
- ```
-podman ps
-CONTAINER ID  IMAGE                                      COMMAND               CREATED        STATUS        PORTS                    NAMES
-d292c6ff28e9  localhost/podman-pause:4.6.1-1702418000                          9 minutes ago  Up 9 minutes  127.0.0.1:20015->80/tcp  80b8de25945f-infra
-d8df02bf6f4a  docker.io/library/postgres:15.5-alpine3.19          --character-set-s...  9 minutes ago  Up 9 minutes  127.0.0.1:20015->80/tcp  postgresql-app
-9e58e5bd676f  docker.io/library/nginx:stable-alpine3.17  nginx -g daemon o...  9 minutes ago  Up 9 minutes  127.0.0.1:20015->80/tcp  tacticalrmm-app
-```
-
-you can see what environment variable is inside the container
-```
-podman exec  tacticalrmm-app env
-TERM=xterm
-container=podman
-NGINX_VERSION=1.24.0
-PKG_RELEASE=1
-NJS_VERSION=0.7.12
-NGINX_IMAGE=docker.io/nginx:stable-alpine3.17
-CONFIG_DATABASE_URI="postgresql://postgres:Nethesis,1234@127.0.0.1:5432/toto"
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-HOME=/root
-```
-
-you can run a shell inside the container
-
-```
-podman exec -ti   tacticalrmm-app sh
-/ # 
-```
 ## Testing
 
-Test the module using the `test-module.sh` script:
+Continuous integration:
 
+- `Publish images` builds the module image on every push.
+- `Test module` installs the image on a QEMU NS8 node and runs the Robot Framework suite in `tests/`. It runs after `Publish images` succeeds on `dev` and on `main`.
+- `Build API JSON Schema docs` and the security scan run alongside.
 
-    ./test-module.sh <NODE_ADDR> ghcr.io/geniusdynamics/tacticalrmm:latest
+The suite installs the module, configures a host name, reads the configuration back, waits until the web UI and the API answer through Traefik, takes UI screenshots and removes the module.
 
-The tests are made using [Robot Framework](https://robotframework.org/)
+Run it locally with the NS8 standard infrastructure described in the [ns8-github-actions README](https://github.com/NethServer/ns8-github-actions/blob/v1/README.md#running-tests-locally).
 
-## UI translation
+## Open items
 
-Translated with [Weblate](https://hosted.weblate.org/projects/ns8/).
+- metadata: documentation_url is a placeholder
+- metadata: categories empty (use standard categories)
+- MeshCentral fetches its web certificate from `https://<MESH_HOST>:443/` to give its hash to the agents: the host name must resolve and serve the Traefik certificate.
 
-To setup the translation process:
+## Upstream
 
-- add [GitHub Weblate app](https://docs.weblate.org/en/latest/admin/continuous.html#github-setup) to your repository
-- add your repository to [hosted.weblate.org]((https://hosted.weblate.org) or ask a NethServer developer to add it to ns8 Weblate project
+Application documentation: https://docs.tacticalrmm.com/
+
+## License
+
+GPL-3.0-or-later. See [LICENSE](LICENSE).

@@ -3,37 +3,48 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
+#
+# One-shot setup of Tactical RMM: copies the code to the tactical_data
+# volume, runs the migrations, creates the dashboard user and writes the
+# ready file the other containers wait for. It runs in the foreground and
+# stays "active (exited)" after a successful run.
+#
+
 [Unit]
 Description=Podman tactical-init.service
 BindsTo=tacticalrmm.service
-After=tacticalrmm.service postgresql-app.service redis-app.service
+After=tacticalrmm.service postgresql-app.service redis-app.service tactical-meshcentral.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%E/state/environment
-# EnvironmentFile=%E/state/secrets/passwords.secret
-Restart=always
+Type=exec
+RemainAfterExit=yes
+Restart=on-failure
+RestartSec=10
 TimeoutStopSec=70
-TimeoutStartSec=300
-ExecStartPre=/bin/rm -f %t/tactical-init.pid %t/tactical-init.ctr-id
-ExecStartPre=/bin/mkdir -p %E/state/restore/
-ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-init.pid \
-    --cidfile %t/tactical-init.ctr-id --cgroups=no-conmon \
-    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-init \
-    --volume tactical_data:/opt/tactical:Z \
-    --volume mesh_data:/meshcentral-data:Z \
-    --volume mongo_data:/mongo/data/db:Z \
-    --volume redis_data:/redis/data:Z \
-    --env-file=%E/state/tactical-init-db.env \
+ExecStartPre=/bin/rm -f %t/tactical-init.ctr-id
+ExecStart=/usr/bin/podman run --rm \
+    --cidfile %t/tactical-init.ctr-id \
+    --pod-id-file %t/tacticalrmm.pod-id --replace --name tactical-init \
+    --volume tactical_data:/opt/tactical:z \
+    --volume mesh_data:/meshcentral-data:z \
     --env-file=%E/state/tactical.env \
-    --env-file=%E/state/mesh_config.env \
+    --env POSTGRES_HOST=127.0.0.1 \
+    --env POSTGRES_USER=postgres \
+    --env POSTGRES_DB=tacticalrmm \
+    --env REDIS_HOST=127.0.0.1 \
+    --env MESH_SERVICE=127.0.0.1 \
+    --env NATS_CONNECT_HOST=127.0.0.1 \
+    --env APP_HOST=${TRAEFIK_HOST} \
+    --env API_HOST=${API_HOST} \
+    --env MESH_HOST=${MESH_HOST} \
+    --env MESH_USER=${MESH_USER} \
+    --env TRMM_USER=${TACTICAL_USER} \
     ${TACTICAL_IMAGE} tactical-init
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-init.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-init.ctr-id
-ExecReload=/usr/bin/podman kill -s HUP tactical-init
 SyslogIdentifier=%u
-PIDFile=%t/tactical-init.pid
-Type=forking
 
 [Install]
 WantedBy=default.target

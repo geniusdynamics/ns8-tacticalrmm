@@ -11,20 +11,17 @@ After=tacticalrmm.service tactical-init.service
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 EnvironmentFile=%E/state/environment
-# EnvironmentFile=%E/state/secrets/passwords.secret
 Restart=always
+RestartSec=10
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/tactical-nats.pid %t/tactical-nats.ctr-id
-ExecStartPre=/bin/mkdir -p %E/state/restore/
 ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-nats.pid \
     --cidfile %t/tactical-nats.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-nats \
-    --volume tactical_data:/opt/tactical:Z \
-    --env-file=%E/state/tactical.env \
-     ${TACTICAL_NATS_IMAGE}
+    --volume tactical_data:/opt/tactical:z \
+    ${TACTICAL_NATS_IMAGE}
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-nats.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-nats.ctr-id
-ExecReload=/usr/bin/podman kill -s HUP tactical-nats
 SyslogIdentifier=%u
 PIDFile=%t/tactical-nats.pid
 Type=forking

@@ -1,0 +1,37 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# Reverse proxy of the pod, configured by configure-module (state/nginx.conf).
+# The image entrypoint is skipped: it writes its own TLS servers on 8080/4443.
+#
+
+[Unit]
+Description=Podman tactical-nginx.service
+BindsTo=tacticalrmm.service
+After=tacticalrmm.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%E/state/environment
+Restart=always
+RestartSec=10
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/tactical-nginx.pid %t/tactical-nginx.ctr-id
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-nginx.pid \
+    --cidfile %t/tactical-nginx.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-nginx \
+    --volume tactical_data:/opt/tactical:z \
+    --volume %E/state/nginx.conf:/etc/nginx/conf.d/default.conf:ro,z \
+    --entrypoint=nginx \
+    ${TACTICAL_NGINX_IMAGE} -g "daemon off;"
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-nginx.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-nginx.ctr-id
+SyslogIdentifier=%u
+PIDFile=%t/tactical-nginx.pid
+Type=forking
+
+[Install]
+WantedBy=default.target

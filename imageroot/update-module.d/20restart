@@ -5,11 +5,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-# If the control reaches this step, the service can be enabled and started
-
 set -e
 
 # Redirect any output to the journal (stderr)
 exec 1>&2
 
-systemctl --user try-restart tacticalrmm.service
+systemctl --user try-restart tacticalrmm.service \
+    postgresql-app.service redis-app.service \
+    tactical-nginx.service tactical-meshcentral.service tactical-init.service \
+    tactical-backend.service tactical-websockets.service \
+    tactical-celery.service tactical-celerybeat.service \
+    tactical-nats.service tactical-frontend.service
