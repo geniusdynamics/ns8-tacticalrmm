@@ -18,8 +18,8 @@ exit $ec
 EOS
 
 # Override the image /docker-entrypoint-initdb.d contents, to restore the
-# DB dump file. The container will be stopped at the end
-
+# DB dump file. The container will be stopped at the end. The database
+# credentials are the ones of this instance (state/database.env).
 podman run \
     --rm \
     --interactive \
@@ -27,9 +27,7 @@ podman run \
     --volume=./restore:/docker-entrypoint-initdb.d/:Z \
     --volume=postgres-data:/var/lib/postgresql:Z \
     --replace --name=restore_db \
-    --env POSTGRES_USER=postgres \
-    --env POSTGRES_PASSWORD=Nethesis,1234 \
-    --env POSTGRES_DB=tacticalrmm \
+    --env-file=./database.env \
     --env TZ=UTC \
     "${POSTGRES_IMAGE}" < tacticalrmm.pg_dump
 

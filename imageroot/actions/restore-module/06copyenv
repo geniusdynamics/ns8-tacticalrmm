@@ -17,7 +17,10 @@ for evar in [
         "TRAEFIK_HOST",
         "TRAEFIK_HTTP2HTTPS",
         "TRAEFIK_LETS_ENCRYPT",
+        "API_HOST",
+        "MESH_HOST",
+        "MESH_USER",
+        "TACTICAL_USER",
     ]:
-    agent.set_env(evar, original_environment[evar])
-
-agent.dump_env()
+    if evar in original_environment:
+        agent.set_env(evar, original_environment[evar])

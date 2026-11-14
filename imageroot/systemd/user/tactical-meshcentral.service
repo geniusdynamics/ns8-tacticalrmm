@@ -1,0 +1,43 @@
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+
+#
+# MeshCentral, configured by configure-module (state/meshcentral-config.json)
+#
+
+[Unit]
+Description=Podman tactical-meshcentral.service
+BindsTo=tacticalrmm.service
+After=tacticalrmm.service tactical-nginx.service
+Before=tactical-init.service
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+EnvironmentFile=%E/state/environment
+Restart=always
+RestartSec=10
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/tactical-meshcentral.pid %t/tactical-meshcentral.ctr-id
+ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-meshcentral.pid \
+    --cidfile %t/tactical-meshcentral.ctr-id --cgroups=no-conmon \
+    --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-meshcentral \
+    --volume tactical_data:/opt/tactical:z \
+    --volume mesh_data:/home/node/app/meshcentral-data:z,U \
+    --volume %E/state/meshcentral-config.json:/home/node/app/meshcentral-data/config.json:ro,z \
+    --env-file=%E/state/meshcentral.env \
+    --env MESH_HOST=${MESH_HOST} \
+    --env MESH_USER=${MESH_USER} \
+    --env MESH_PERSISTENT_CONFIG=1 \
+    --env NGINX_HOST_IP=127.0.0.1 \
+    --env NGINX_HOST_PORT=8000 \
+    ${TACTICAL_MESHCENTRAL_IMAGE}
+ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-meshcentral.ctr-id -t 10
+ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-meshcentral.ctr-id
+SyslogIdentifier=%u
+PIDFile=%t/tactical-meshcentral.pid
+Type=forking
+
+[Install]
+WantedBy=default.target

@@ -7,7 +7,11 @@
         {
             "host": "tacticalrmm.domain.org",
             "http2https": true,
-            "lets_encrypt": true
+            "lets_encrypt": false,
+            "API_HOST": "api.tacticalrmm.domain.org",
+            "MESH_HOST": "mesh.tacticalrmm.domain.org",
+            "TACTICAL_USER": "admin",
+            "TACTICAL_PASSWORD": "Nethesis,1234"
         }
     ],
     "type": "object",
@@ -32,6 +36,34 @@
             "type": "boolean",
             "title": "HTTP to HTTPS redirection",
             "description": "Redirect all the HTTP requests to HTTPS"
+        },
+        "API_HOST": {
+            "type": "string",
+            "description": "Host name of the API, like 'api.tacticalrmm.domain.org'. Default: api.<host>",
+            "maxLength": 253
+        },
+        "MESH_HOST": {
+            "type": "string",
+            "description": "Host name of MeshCentral, like 'mesh.tacticalrmm.domain.org'. Default: mesh.<host>",
+            "maxLength": 253
+        },
+        "MESH_USER": {
+            "type": "string",
+            "description": "MeshCentral admin account. Default: meshadmin",
+            "maxLength": 64
+        },
+        "MESH_PASSWORD": {
+            "type": "string",
+            "description": "Password of the MeshCentral admin account. Empty keeps the current one"
+        },
+        "TACTICAL_USER": {
+            "type": "string",
+            "description": "Tactical RMM dashboard user, created at the first start. Default: admin",
+            "maxLength": 64
+        },
+        "TACTICAL_PASSWORD": {
+            "type": "string",
+            "description": "Password of the dashboard user, used when the user is created. Empty keeps the current one"
         }
     }
 }
