@@ -4,7 +4,10 @@
 #
 
 #
-# MeshCentral, configured by configure-module (state/meshcentral-config.json)
+# MeshCentral, configured by configure-module (state/meshcentral-config.json).
+# tactical-init creates /opt/tactical/tmp and gives the volumes to uid 1000:
+# wait for it, otherwise the entrypoint fails to write the login token key and
+# the restart of this unit restarts the whole pod.
 #
 
 [Unit]
@@ -24,7 +27,7 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-meshcentral.pid \
     --cidfile %t/tactical-meshcentral.ctr-id --cgroups=no-conmon \
     --pod-id-file %t/tacticalrmm.pod-id --replace -d --name tactical-meshcentral \
     --volume tactical_data:/opt/tactical:z \
-    --volume mesh_data:/home/node/app/meshcentral-data:z,U \
+    --volume mesh_data:/home/node/app/meshcentral-data:z \
     --volume %E/state/meshcentral-config.json:/home/node/app/meshcentral-data/config.json:ro,z \
     --env-file=%E/state/meshcentral.env \
     --env MESH_HOST=${MESH_HOST} \
@@ -32,7 +35,8 @@ ExecStart=/usr/bin/podman run --conmon-pidfile %t/tactical-meshcentral.pid \
     --env MESH_PERSISTENT_CONFIG=1 \
     --env NGINX_HOST_IP=127.0.0.1 \
     --env NGINX_HOST_PORT=8000 \
-    ${TACTICAL_MESHCENTRAL_IMAGE}
+    --entrypoint=/bin/bash \
+    ${TACTICAL_MESHCENTRAL_IMAGE} -c "until [ -w /opt/tactical/tmp ]; do echo waiting for tactical-init to prepare the volumes; sleep 5; done; exec /entrypoint.sh"
 ExecStop=/usr/bin/podman stop --ignore --cidfile %t/tactical-meshcentral.ctr-id -t 10
 ExecStopPost=/usr/bin/podman rm --ignore -f --cidfile %t/tactical-meshcentral.ctr-id
 SyslogIdentifier=%u
