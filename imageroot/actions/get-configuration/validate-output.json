@@ -7,7 +7,11 @@
         {
             "host": "tacticalrmm.domain.org",
             "http2https": true,
-            "lets_encrypt": true
+            "lets_encrypt": true,
+            "API_HOST": "api.tacticalrmm.domain.org",
+            "MESH_HOST": "mesh.tacticalrmm.domain.org",
+            "MESH_USER": "meshadmin",
+            "TACTICAL_USER": "admin"
         }
     ],
     "type": "object",
@@ -31,6 +35,18 @@
             "type": "boolean",
             "title": "HTTP to HTTPS redirection",
             "description": "Redirect all the HTTP requests to HTTPS"
+        },
+        "API_HOST": {
+            "type": "string"
+        },
+        "MESH_HOST": {
+            "type": "string"
+        },
+        "MESH_USER": {
+            "type": "string"
+        },
+        "TACTICAL_USER": {
+            "type": "string"
         }
     }
 }

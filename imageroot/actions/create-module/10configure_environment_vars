@@ -5,47 +5,39 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 
-import json
-import sys
-import agent
+# Generate the secrets of the instance. They are kept in state files with
+# mode 0600 and passed to the containers with --env-file.
+
 import os
-
-# Try to parse the stdin as JSON.
-# If parsing fails, output everything to stderr
-data = json.load(sys.stdin)
-
-# split port and set in env
-port = os.environ["TCP_PORTS"].split(',')
-agent.set_env("API_TCP_PORT", port[1])
-
-#This is specific to you module, so you need to change it accordingly.
-
-def generate_random_password(length):
-    # Generate random bytes and convert them to a hexadecimal string
-    random_bytes = os.urandom(length)
-    password = random_bytes.hex()
-    return password[:length]
-
-# Configure POSTGRES DB
-
-POSTGRES_DB =  "tacticalrmm"
-POSTGRES_USER =  "postgres"
-POSTGRES_PASSWORD = generate_random_password(16)
-
-posgtres_config = {
-    'POSTGRES_DB': POSTGRES_DB,
-    'POSTGRES_USER': POSTGRES_USER,
-    'POSTGRES_PASSWORD': POSTGRES_PASSWORD
-}
-agent.write_envfile("database.env", posgtres_config)
+import secrets
 
 
-tactical_init = {
-    "POSTGRES_USER": POSTGRES_USER,
-    "POSTGRES_PASS": POSTGRES_PASSWORD,
-    "POSTGRES_HOST": "postgresql-app",
-    "REDIS_HOST": "redis-app"
-}
-agent.write_envfile("tactical-init-db.env", tactical_init)
-# just before starting systemd unit
-#agent.dump_env()
+def write_secret_file(name, values):
+    path = os.path.join(os.environ.get("AGENT_STATE_DIR", "."), name)
+    if os.path.exists(path):
+        return  # never overwrite existing secrets (clone, restore)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(fd, "w") as f:
+        for key, value in values.items():
+            f.write(f"{key}={value}\n")
+
+
+postgres_password = secrets.token_hex(16)
+
+# PostgreSQL container
+write_secret_file("database.env", {
+    "POSTGRES_DB": "tacticalrmm",
+    "POSTGRES_USER": "postgres",
+    "POSTGRES_PASSWORD": postgres_password,
+})
+
+# Tactical RMM init container: database access and first dashboard user
+write_secret_file("tactical.env", {
+    "POSTGRES_PASS": postgres_password,
+    "TRMM_PASS": secrets.token_urlsafe(16),
+})
+
+# MeshCentral container: password of the MeshCentral admin account
+write_secret_file("meshcentral.env", {
+    "MESH_PASS": secrets.token_urlsafe(16),
+})

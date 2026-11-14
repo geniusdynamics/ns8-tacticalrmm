@@ -4,15 +4,16 @@
 #
 
 #
-# This systemd unit starts a tacticalrmm instance using Podman.
-# Most parts of this file come from podman-generate-systemd.
+# Pod of the Tactical RMM instance. All the containers share 127.0.0.1.
+# Traefik sends the app, API and MeshCentral host names to the nginx
+# container, on port 8000 of the pod.
 #
 
 [Unit]
 Description=Podman tacticalrmm.service
-Wants=tactical-init.service tactical-websockets.service tactical-celerybeat.service tactical-celery.service
-Requires=postgresql-app.service redis-app.service  tactical-nats.service tactical-backend.service  tactical-frontend.service 
-Before=postgresql-app.service redis-app.service tactical-init.service tactical-nats.service tactical-backend.service tactical-websockets.service tactical-frontend.service tactical-celerybeat.service tactical-celery.service
+Requires=postgresql-app.service redis-app.service tactical-nginx.service tactical-meshcentral.service tactical-backend.service tactical-websockets.service tactical-celery.service tactical-celerybeat.service tactical-nats.service tactical-frontend.service
+Wants=tactical-init.service
+Before=postgresql-app.service redis-app.service tactical-nginx.service tactical-meshcentral.service tactical-init.service tactical-backend.service tactical-websockets.service tactical-celery.service tactical-celerybeat.service tactical-nats.service tactical-frontend.service
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
@@ -23,8 +24,7 @@ ExecStartPre=/bin/rm -f %t/tacticalrmm.pid %t/tacticalrmm.pod-id
 ExecStartPre=/usr/bin/podman pod create --infra-conmon-pidfile %t/tacticalrmm.pid \
     --pod-id-file %t/tacticalrmm.pod-id \
     --name tacticalrmm \
-    --publish 127.0.0.1:${TCP_PORT}:8080 \
-    --publish 127.0.0.1:${API_TCP_PORT}:8080 \
+    --publish 127.0.0.1:${TCP_PORT}:8000 \
     --replace
 ExecStart=/usr/bin/podman pod start --pod-id-file %t/tacticalrmm.pod-id
 ExecStop=/usr/bin/podman pod stop --ignore --pod-id-file %t/tacticalrmm.pod-id -t 10

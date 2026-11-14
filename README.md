@@ -29,10 +29,18 @@ EOF
 | `host` | yes | string | Host name for the application, like 'tacticalrmm.domain.org' |
 | `lets_encrypt` | yes | boolean | Request a valid Let's Encrypt certificate. |
 | `http2https` | yes | boolean | Redirect all the HTTP requests to HTTPS |
+| `API_HOST` | no | string | Host name of the API. Default: `api.<host>` |
+| `MESH_HOST` | no | string | Host name of MeshCentral. Default: `mesh.<host>` |
+| `TACTICAL_USER` | no | string | Dashboard user, created at the first start. Default: `admin` |
+| `TACTICAL_PASSWORD` | no | string | Password of the dashboard user. Set it before the first start: the user is created only once. Default: random |
+| `MESH_USER` | no | string | MeshCentral admin account. Default: `meshadmin` |
+| `MESH_PASSWORD` | no | string | Password of the MeshCentral admin account. Default: random |
+
+The three host names must resolve to the node: Traefik routes each of them to the module.
 
 ## Configuration output
 
-`get-configuration` returns: `host`, `lets_encrypt`, `http2https`.
+`get-configuration` returns: `host`, `lets_encrypt`, `http2https`, `API_HOST`, `MESH_HOST`, `MESH_USER`, `TACTICAL_USER`. It never returns the passwords.
 
 ## Images
 
@@ -40,15 +48,18 @@ EOF
 |---|---|
 | `docker.io/postgres` | `18.7-alpine3.24` |
 | `docker.io/redis` | `8.10.3-alpine3.23` |
-| `docker.io/tacticalrmm/tactical` | `0.20.1` |
-| `docker.io/tacticalrmm/tactical-nats` | `0.20.1` |
-| `docker.io/tacticalrmm/tactical-meshcentral` | `0.20.1` |
-| `docker.io/mongo` | `9.0.8` |
-| `docker.io/tacticalrmm/tactical-frontend` | `0.20.1` |
+| `docker.io/tacticalrmm/tactical` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-nats` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-meshcentral` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-frontend` | `1.6.1` |
+| `docker.io/tacticalrmm/tactical-nginx` | `1.6.1` |
+
+MeshCentral keeps its data in its built-in NeDB database (volume `mesh_data`), so the module runs no MongoDB.
 
 ## Network and access
 
-- Reserves 2 TCP port(s) on the node. The web application is published through Traefik on the configured host name.
+- Reserves 1 TCP port on the node. Traefik terminates TLS and sends the app, API and MeshCentral host names to the nginx container of the pod, which dispatches them by host name.
+- All the containers run in one pod and talk on 127.0.0.1: nginx 8000, uwsgi 8080, frontend 8081, websockets 8383, NATS 4222 and 9235, MeshCentral 4443, PostgreSQL 5432, Redis 6379.
 - Runs rootless.
 - Declares these NS8 authorizations: `traefik@node:routeadm`.
 
@@ -56,8 +67,8 @@ EOF
 
 The following paths are included in the NS8 backup (`imageroot/etc/state-include.conf`):
 
-- `state/tacticalrmm.sql`
-- `volumes/tacticalrmm-app`
+- `state/tacticalrmm.pg_dump`: PostgreSQL dump written by `bin/module-dump-state`
+- `volumes/mesh_data`: MeshCentral database and certificates
 
 ## Services
 
@@ -67,10 +78,12 @@ The following paths are included in the NS8 backup (`imageroot/etc/state-include
 - `tactical-celery.service`
 - `tactical-celerybeat.service`
 - `tactical-frontend.service`
-- `tactical-init.service`
+- `tactical-init.service`: one-shot setup (migrations, first user, ready file); it stays `active (exited)`
+- `tactical-meshcentral.service`
+- `tactical-nginx.service`
 - `tactical-nats.service`
 - `tactical-websockets.service`
-- `tacticalrmm.service`
+- `tacticalrmm.service`: the pod
 
 ## Get the configuration
 
@@ -93,45 +106,15 @@ Continuous integration:
 - `Test module` installs the image on a QEMU NS8 node and runs the Robot Framework suite in `tests/`. It runs after `Publish images` succeeds on `dev` and on `main`.
 - `Build API JSON Schema docs` and the security scan run alongside.
 
-The suite installs the module, configures a host name, checks that the web application answers through Traefik, takes UI screenshots and removes the module.
+The suite installs the module, configures a host name, reads the configuration back, waits until the web UI and the API answer through Traefik, takes UI screenshots and removes the module.
 
 Run it locally with the NS8 standard infrastructure described in the [ns8-github-actions README](https://github.com/NethServer/ns8-github-actions/blob/v1/README.md#running-tests-locally).
 
 ## Open items
 
-Found by the NS8 module standards check. These must be resolved before a stable release:
-
-- tests/tacticalrmm.robot generated from template: set real configure payload and URL check
 - metadata: documentation_url is a placeholder
 - metadata: categories empty (use standard categories)
-- postgresql-app.service: uses %S/state, kickstart uses %E/state
-- tactical-init.service: uses %S/state, kickstart uses %E/state
-- tacticalrmm.service: uses %S/state, kickstart uses %E/state
-- tactical-celery.service: uses %S/state, kickstart uses %E/state
-- redis-app.service: uses %S/state, kickstart uses %E/state
-- tactical-nats.service: uses %S/state, kickstart uses %E/state
-- tactical-celerybeat.service: uses %S/state, kickstart uses %E/state
-- tactical-websockets.service: uses %S/state, kickstart uses %E/state
-- tactical-backend.service: uses %S/state, kickstart uses %E/state
-- tactical-frontend.service: uses %S/state, kickstart uses %E/state
-- discover-smarthost still present: remove if the app does not use SMTP
-- secrets passed through agent.set_env(): move to state/passwords.env
-- README still has the template boilerplate
-- postgresql-app.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-init.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tacticalrmm.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-celery.service: %S/state changed to %E/state (review the bind mounts that remain)
-- redis-app.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-nats.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-celerybeat.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-websockets.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-backend.service: %S/state changed to %E/state (review the bind mounts that remain)
-- tactical-frontend.service: %S/state changed to %E/state (review the bind mounts that remain)
-- imageroot/actions/configure-module/80start_services: smarthost lines removed, check the unit still starts
-- POSTGRES_IMAGE is used by the module but no image in the label provides it: leftover from the template?
-- REDIS_IMAGE is used by the module but no image in the label provides it: leftover from the template?
-- TACTICAL_IMAGE is used by the module but no image in the label provides it: leftover from the template?
-- TACTICAL_NATS_IMAGE is used by the module but no image in the label provides it: leftover from the template?
+- MeshCentral fetches its web certificate from `https://<MESH_HOST>:443/` to give its hash to the agents: the host name must resolve and serve the Traefik certificate.
 
 ## Upstream
 
